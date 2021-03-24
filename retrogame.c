@@ -622,7 +622,8 @@ static void pinConfigLoad() {
 		if((key[i] > KEY_RESERVED) && (key[i] < GND))
 			bitmask |= (1 << i);
 	}
-	pull(bitmask, 2); // Enable pullups on input pins
+	//pull(bitmask, 2); // Enable pullups on input pins
+	pull(bitmask, 1); // Enable pulldwns on input pins
 	for(i=0; (i<5) && !vulcanMask[i]; i++); // If no vulcanMask bits,
 	if(i >= 5) key[160] = KEY_RESERVED;     // make sure no vulcanKey
 	// Pullups on MCP23017 devices will be a separate pass later
@@ -638,12 +639,13 @@ static void pinConfigLoad() {
 			continue;
 		sprintf(buf, "%d", i);
 		write(fd, buf, strlen(buf));    // Export pin
-		pinSetup(i, "active_low", "0"); // Don't invert
+		//pinSetup(i, "active_low", "0"); // Don't invert
+		pinSetup(i, "active_low", "1"); // Invert for my pins
 		if(key[i] >= GND) {
 			// Set pin to output, value 0 (ground)
-			if(pinSetup(i, "direction", "out") ||
-			   pinSetup(i, "value"    , "0"))
-				err("Pin config failed (GND)");
+			//if(pinSetup(i, "direction", "out") ||
+			//   pinSetup(i, "value"    , "0"))
+			//	err("Pin config failed (GND)");
 		} else {
 			// Set pin to input, detect edge events
 			char x;

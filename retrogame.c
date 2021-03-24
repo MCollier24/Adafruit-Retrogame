@@ -123,15 +123,14 @@ struct {
 	// (using HDMI or composite instead), as with our original
 	// retro gaming guide.
 	// Input   Output (from /usr/include/linux/input.h)
-	{  25,     KEY_LEFT,     SOURCE_GPIO },   // Joystick (4 pins)
-	{   9,     KEY_RIGHT,    SOURCE_GPIO },
-	{  10,     KEY_UP,       SOURCE_GPIO },
-	{  17,     KEY_DOWN,     SOURCE_GPIO },
-	{  23,     KEY_LEFTCTRL, SOURCE_GPIO },   // A/Fire/jump/primary
-	{   7,     KEY_LEFTALT,  SOURCE_GPIO },   // B/Bomb/secondary
-	{   0,     KEY_X,        SOURCE_MCP1 },   // MCP Example configuration
-	{   1,     GND,          SOURCE_MCP1 },   // Move this to comments!
-	{   2,     KEY_Z,        SOURCE_MCP1 },
+	{  16,     KEY_LEFT,     SOURCE_GPIO },   // Joystick (4 pins)
+	{  19,     KEY_RIGHT,    SOURCE_GPIO },
+	{  12,     KEY_UP,       SOURCE_GPIO },
+	{  13,     KEY_DOWN,     SOURCE_GPIO },
+	{  25,     KEY_LEFTCTRL, SOURCE_GPIO },   // A/Fire/jump/primary
+	{  24,     KEY_LEFTALT,  SOURCE_GPIO },   // B/Bomb/secondary
+	{  22,     KEY_SPACE,    SOURCE_GPIO },   // MCP Example configuration
+	{  23,     KEY_ENTER,    SOURCE_GPIO },   // Move this to comments!
 	// For credit/start/etc., use USB keyboard or add more buttons.
 	{  -1,     -1            -1          } }; // END OF LIST, DO NOT CHANGE
 
@@ -423,7 +422,7 @@ int main(int argc, char *argv[]) {
 	// Make combined bitmap of pullup-enabled pins:
 	for(bitmask=i=0; io[i].pin >= 0; i++)
 		if(io[i].key != GND && io[i].source == SOURCE_GPIO) bitmask |= (1 << io[i].pin);
-	gpio[GPPUD]     = 2;                    // Enable pullup
+	gpio[GPPUD]     = 1;                    // Enable pullup
 	for(shortWait=150;--shortWait;);        // Min 150 cycle wait
 	gpio[GPPUDCLK0] = bitmask;              // Set pullup mask
 	for(shortWait=150;--shortWait;);        // Wait again
@@ -481,7 +480,7 @@ int main(int argc, char *argv[]) {
 	for(i=j=0; io[i].pin >= 0; i++) { // For each pin of interest...
 		sprintf(buf, "%d", io[i].pin);
 		write(fd, buf, strlen(buf));             // Export pin
-		pinConfig(io[i].pin, "active_low", "0"); // Don't invert
+		pinConfig(io[i].pin, "active_low", "1"); // invert
 		if(io[i].key == GND && io[i].source == SOURCE_GPIO) {
 			// Set pin to output, value 0 (ground)
 			if(pinConfig(io[i].pin, "direction", "out") ||
